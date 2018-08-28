@@ -4,9 +4,9 @@ namespace Grav\Plugin\FlexDirectory;
 use Grav\Common\File\CompiledJsonFile;
 use Grav\Common\File\CompiledYamlFile;
 use Grav\Common\Grav;
+use Grav\Common\Yaml;
 use Grav\Common\Data\Blueprint;
 use Grav\Common\Data\Data;
-use Symfony\Component\Yaml\Yaml;
 
 class SimpleDataContainer
 {
