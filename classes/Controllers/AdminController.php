@@ -80,6 +80,35 @@ class AdminController extends SimpleController
         $this->grav['session']->post_entries_save = $saved_option;
     }
 
+        /**
+     * Switch the content language. Optionally redirect to a different page.
+     *
+     */
+    protected function taskSwitchlanguage()
+    {
+        if (!$this->authorizeTask('switch language', ['admin.flex-directory', 'admin.super'])) {
+            return false;
+        }
+        $data = (array)$this->data;
+        if (isset($data['lang'])) {
+            $language = $data['lang'];
+        } else {
+            $language = $this->grav['uri']->param('lang');
+        }
+        if (isset($data['redirect'])) {
+            $redirect = 'flex-directory/' . $data['redirect'];
+        } else {
+            $redirect = 'flex-directory';
+        }
+        if ($language) {
+            $this->grav['session']->admin_lang = $language ?: 'en';
+        }
+        $this->admin->setMessage($this->admin->translate('PLUGIN_ADMIN.SUCCESSFULLY_SWITCHED_LANGUAGE'), 'info');
+
+        $id = $this->grav['uri']->param('id');
+        $this->setRedirect($this->location . '/' . $this->target . ($id ? '/id:'.$id : ''));
+    }
+
     /**
      * Dynamic method to 'get' data types
      *
