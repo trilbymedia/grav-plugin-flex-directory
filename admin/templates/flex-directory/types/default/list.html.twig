@@ -50,7 +50,7 @@
             <tr>
                 {% for key,options in fields %}
                     {% set field = schema.get(key) %}
-                    <td>
+                    <td align="{{ options.align ?: options.align }}">
                         {% if options.link == 'edit' %}
                             <a href="{{ entry_url ~ id }}">{{ entry[key] }}</a>
                         {% elseif field.type == 'toggle' %}
@@ -131,6 +131,14 @@
                         filter_startsWith: false,
                         filter_ignoreCase: true
                 },
+                sortList: [
+                    {% for key,options in fields %}
+                    {% if options.sort %}
+                        {% if loop.index > 1 %}, {% endif %}[{{ loop.index - 1 }}, 0]
+                    {% else %}
+                    {% endif %}
+                    {% endfor %}
+                ],
                 initialized: function(table) {
                     list.show();
                 }
