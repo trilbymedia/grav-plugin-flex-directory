@@ -66,6 +66,9 @@ class FlexDirectoryPlugin extends Plugin
 
         $config = $this->config->get('plugins.flex-directory');
         $blueprints = $config['directories'] ?: [];
+        if (is_string($blueprints)) {
+            $blueprints = FlexDirectory::getAllFromFolder($blueprints);
+        }
 
         // Add to DI container
         $this->grav['flex_directory'] = function () use ($blueprints) {
