@@ -11,6 +11,9 @@ bugs: https://github.com/trilbymedia/grav-plugin-flex-directory/issues
 docs: https://github.com/trilbymedia/grav-plugin-flex-directory/blob/develop/README.md
 license: MIT
 
+dependencies:
+- { name: grav, version: '>=1.5.1' }
+
 form:
   validation: strict
   fields:
