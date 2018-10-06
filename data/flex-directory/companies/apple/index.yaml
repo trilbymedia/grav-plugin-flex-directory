@@ -1,0 +1,10 @@
+published: '1'
+slug: apple
+company: Apple
+email: contacts@apple.com
+website: 'https://apple.com'
+address:
+  street: 'One Apple Park Way'
+  city: Cupertino
+  country: USA
+tags: 'ipad,iphone,mac'

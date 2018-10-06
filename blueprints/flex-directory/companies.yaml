@@ -1,0 +1,69 @@
+title: Companies
+description: Simple companies directory with tags.
+type: flex-directory
+
+config:
+  admin:
+    list:
+      title: name
+      fields:
+        published:
+          width: 8
+        company:
+          link: edit
+          sort: 1
+        email:
+          align: right
+        website:
+        tags:
+  data:
+    storage:
+      type: folder
+      file: user://data/flex-directory/companies/%s/index.yaml
+      key: slug
+
+form:
+  validation: loose
+
+  fields:
+    published:
+      type: toggle
+      label: Published
+      highlight: 1
+      default: 1
+      options:
+        1: PLUGIN_ADMIN.YES
+        0: PLUGIN_ADMIN.NO
+      validate:
+        type: bool
+        required: true
+    slug:
+      type: slug
+      label: Slug
+    company:
+      type: text
+      label: Company Name
+    email:
+      type: email
+      label: Email Address
+      validate:
+        required: true
+    website:
+      type: url
+      label: Web Site
+    address.street:
+      type: text
+      label: Address
+    address.city:
+      type: text
+      label: City
+    address.country:
+      type: text
+      label: Country
+    tags:
+      type: selectize
+      size: large
+      label: Tags
+      classes: fancy
+      validate:
+        type: commalist
