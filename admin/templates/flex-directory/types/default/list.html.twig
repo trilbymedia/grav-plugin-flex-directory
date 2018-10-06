@@ -27,7 +27,7 @@
 </div>
 {% elseif not collection.count %}
     <div class="no-entries">
-        There are currently no entries, click the <a href="{{ base_url ~ '/flex-directory/' ~ target ~ '/action:add' }}">Add</a> button to create a new one...
+        There are currently no entries, click the <a href="{{ base_url ~ '/flex-directory/' ~ target ~ '/action:add' }}">{{ "PLUGIN_ADMIN.ADD"|tu }}</a> button to create a new one...
     </div>
 {% else %}
     <table id="data-table" class="tablesorter tablesorter-default">
@@ -42,7 +42,7 @@
             {% for key,options in fields %}
             <th>{{ schema.get(key).label }}</th>
             {% endfor %}
-            <th>Actions</th>
+            <th>{{ "PLUGIN_FLEX_DIRECTORY.ACTIONS"|tu }}</th>
         </tr>
         </thead>
         <tbody>
@@ -71,11 +71,11 @@
                 <td>
                     {% set entry_title = title_field ? "'" ~ entry[title_field]|join(' ') ~ "'" : 'Item' %}
                     <a href="{{ entry_url ~ id }}"
-                       title="Edit {{ entry_title }}"
+                       title="{{ "PLUGIN_ADMIN.EDIT"|tu }}: {{ entry_title }}"
                        class="edit-action"><i class="fa fa-pencil"></i></a>
                     <a href="#delete"
                        class="page-delete delete-action"
-                       title="Delete {{ entry_title }}"
+                       title="{{ "PLUGIN_ADMIN.DELETE"|tu }}: {{ entry_title }}"
                        data-remodal-target="delete"
                        data-delete-url="{{ uri.addNonce(entry_url ~ id  ~ '/action' ~ separator ~ 'delete', 'admin-form', 'admin-nonce') }}"><i class="fa fa-close"></i></a>
                 </td>
