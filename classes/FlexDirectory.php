@@ -22,6 +22,9 @@ class FlexDirectory implements \Countable
         }
     }
 
+    /**
+     * @return array|FlexType[]
+     */
     public function getAll()
     {
         $params = [
@@ -45,6 +48,9 @@ class FlexDirectory implements \Countable
         return $directories;
     }
 
+    /**
+     * @return array|FlexType[]
+     */
     public function getDirectories()
     {
         return $this->types;
