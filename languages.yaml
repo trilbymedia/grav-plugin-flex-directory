@@ -6,3 +6,11 @@ en:
     EDIT: Edit Item
     LIST: List Items
     ACTIONS: Actions
+ru:
+  PLUGIN_FLEX_DIRECTORY:
+    TITLE: Каталог
+    AFTER_SAVE: Действие после Сохранить...
+    CREATE_NEW: Добавить новое
+    EDIT: Редактировать
+    LIST: Перейти к списку
+    ACTIONS: Действия
