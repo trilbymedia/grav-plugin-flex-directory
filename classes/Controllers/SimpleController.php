@@ -74,15 +74,15 @@ abstract class SimpleController extends AdminBaseController
         $params = [];
 
         // Handle Task & Action
-        if ($this->post && $this->task) {
+        if ($this->task) {
             // validate nonce
             if (!$this->validateNonce()) {
                 return false;
             }
-            $method = $this->task_prefix . ucfirst($this->task);
-
-            $this->handlePostProcesses();
-
+            $method = $this->task_prefix . ucfirst(strtolower($this->task));
+            if ($this->post) {
+                $this->handlePostProcesses();
+            }
         } elseif ($this->target) {
             if (!$this->action) {
                 if ($this->id) {
@@ -92,7 +92,7 @@ abstract class SimpleController extends AdminBaseController
                     $this->action = 'list';
                 }
             }
-            $method = 'task' . ucfirst(strtolower($this->action));
+            $method = $this->task_prefix . ucfirst(strtolower($this->action));
         } else {
             return null;
         }
