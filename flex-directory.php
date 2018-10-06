@@ -99,7 +99,13 @@ class FlexDirectoryPlugin extends Plugin
      */
     public function onAdminMenu()
     {
-        $this->grav['twig']->plugins_hooked_nav['PLUGIN_FLEX_DIRECTORY.TITLE'] = ['route' => $this->name, 'icon' => 'fa-list'];
+        $this->grav['twig']->plugins_hooked_nav['PLUGIN_FLEX_DIRECTORY.TITLE'] = [
+            'route' => $this->name,
+            'icon' => 'fa-list',
+            'badge' => [
+                'count' => $this->grav['flex_directory']->count()
+            ]
+        ];
     }
 
     /**
