@@ -32,6 +32,9 @@
 
 #directory tbody {
   display: table-row-group; }
+  #directory tbody td {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem; }
 
 #directory tr {
   display: table-row;
