@@ -12,5 +12,4 @@ form:
         _post_entries_save:
           label: PLUGIN_FLEX_DIRECTORY.AFTER_SAVE
           type: save-redirect
-          default: create-new
-
+          default: list
