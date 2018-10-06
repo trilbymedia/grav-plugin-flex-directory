@@ -9,9 +9,9 @@ config:
       fields:
         published:
           width: 8
-        name.last:
+        last_name:
           link: edit
-        name.first:
+        first_name:
           link: edit
         company:
         email:
@@ -38,12 +38,12 @@ form:
         type: bool
         required: true
 
-    name.last:
+    last_name:
       type: text
       label: Last Name
       validate:
         required: true
-    name.first:
+    first_name:
       type: text
       label: First Name
       validate:
