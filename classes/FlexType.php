@@ -3,12 +3,14 @@ namespace Grav\Plugin\FlexDirectory;
 
 use Grav\Common\Data\Blueprint;
 use Grav\Common\File\CompiledJsonFile;
+use Grav\Common\File\CompiledMarkdownFile;
 use Grav\Common\File\CompiledYamlFile;
 use Grav\Common\Grav;
 use Grav\Common\Helpers\Base32;
 use Grav\Common\Utils;
 use RocketTheme\Toolbox\ResourceLocator\UniformResourceLocator;
 use RuntimeException;
+use Grav\Plugin\FlexDirectory\Storage\FolderStorage;
 
 /**
  * Class FlexType
@@ -26,6 +28,8 @@ class FlexType
     protected $collection;
     /** @var bool */
     protected $enabled;
+    /** @var array */
+    protected $changes;
 
     /**
      * FlexType constructor.
@@ -38,6 +42,7 @@ class FlexType
         $this->type = $type;
         $this->blueprint_file = $blueprint_file;
         $this->enabled = (bool) $enabled;
+        $this->changes = [];
     }
 
     /**
@@ -141,7 +146,30 @@ class FlexType
     public function save()
     {
         $file = $this->getFile();
-        $file->save($this->collection->jsonSerialize());
+        $type = $this->getStorageType();
+
+        switch ($type) {
+            case 'folder':
+                foreach ($this->changes as $key => $action) {
+                    switch ($action) {
+                        case 'update':
+                            $file->save([ $key => $this->getCollection()->get($key)->jsonSerialize() ]);
+                            break;
+                        case 'delete':
+                            $file->delete($key);
+                            break;
+                        default:
+                            throw new RuntimeException('Unknown save action');
+                    }
+                }
+                break;
+            case 'file':
+                $file->save($this->collection->jsonSerialize());
+                break;
+            default:
+                throw new RuntimeException('Unknown storage type');
+        }
+
         $file->free();
 
         return true;
@@ -165,16 +193,30 @@ class FlexType
     {
         /** @var FlexObject $object */
         $object = null !== $key ? $this->getCollection()->get($key) : null;
+        $field_key = $this->getStorageKey();
 
         if (null === $object) {
-            $key = $this->getNextKey();
+            if (null !== $field_key && !empty($data[$field_key])) {
+                $key = $data[$field_key];
+            }
+            if (empty($key) || $key == '') {
+                $key = $this->getNextKey();
 
+            }
             $object = $this->createObject($data, $key);
         } else {
+            if (null !== $field_key && !empty($data[$field_key])) {
+                if (strcmp($key, $data[$field_key]) != 0) {
+                    $this->changes[$key] = 'delete';
+                    $key = $data[$field_key];
+                }
+            }
             $blueprint = $this->getBlueprint();
 
             $object = $this->createObject($blueprint->mergeData($object->jsonSerialize(), $data), $key);
         }
+
+        $this->changes[$key] = 'update';
 
         $this->getCollection()->set($key, $object);
 
@@ -187,6 +229,8 @@ class FlexType
      */
     public function remove($key)
     {
+        $this->changes[$key] = 'delete';
+
         return $this->getCollection()->remove($key);
     }
 
@@ -208,9 +252,9 @@ class FlexType
      * @param bool $resolve
      * @return string
      */
-    public function getStorage($resolve = false)
+    public function getStorageFilename($resolve = false)
     {
-        $filename = $this->getConfig('data/storage', 'user://data/flex-directory/' . $this->getType() . '.json');
+        $filename = $this->getConfig('data/storage/file', 'user://data/flex-directory/' . $this->getType() . '.json');
 
         if ($resolve) {
             $grav = Grav::instance();
@@ -224,23 +268,60 @@ class FlexType
     }
 
     /**
-     * @return CompiledJsonFile|CompiledYamlFile
+     * @return string
+     */
+    public function getStorageType()
+    {
+        return $this->getConfig('data/storage/type', 'file');
+    }
+
+    /**
+     * @return string
+     */
+    public function getStorageKey()
+    {
+        return $this->getConfig('data/storage/key');
+    }
+
+    /**
+     * @return string
+     */
+    public function getStorage()
+    {
+        return $this->getFile()->filename();
+    }
+
+    /**
+     * @return CompiledJsonFile|CompiledYamlFile|CompiledMarkdownFile
      * @throws RuntimeException
      */
     protected function getFile()
     {
-        $filename = $this->getStorage(true);
+        $filename = $this->getStorageFilename(true);
         $extension = pathinfo($filename, PATHINFO_EXTENSION);
+        $type = $this->getStorageType();
 
-        switch ($extension) {
-            case 'json':
-                $file = CompiledJsonFile::instance($filename);
+        switch ($type) {
+            case 'folder':
+                $file = FolderStorage::instance($filename, $extension);
                 break;
-            case 'yaml':
-                $file = CompiledYamlFile::instance($filename);
+            case 'file':
+                switch ($extension) {
+                    case 'json':
+                        $file = CompiledJsonFile::instance($filename);
+                        break;
+                    case 'yaml':
+                        $file = CompiledYamlFile::instance($filename);
+                        break;
+                    case 'md':
+                        $file = CompiledMarkdownFile::instance($filename);
+                        break;
+                    default:
+                        throw new RuntimeException('Unknown extension type ' . $extension);
+                }
                 break;
             default:
-                throw new RuntimeException('Unknown extension type ' . $extension);
+                throw new RuntimeException('Unknown storage type');
         }
 
         return $file;
