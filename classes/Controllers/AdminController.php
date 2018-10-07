@@ -107,6 +107,7 @@ class AdminController extends SimpleController
 
         $id = $this->grav['uri']->param('id');
         $this->setRedirect($this->location . '/' . $this->target . ($id ? '/id:'.$id : ''));
+        return true;
     }
 
     /**
