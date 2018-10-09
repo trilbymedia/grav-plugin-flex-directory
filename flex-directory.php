@@ -127,7 +127,7 @@ class FlexDirectoryPlugin extends Plugin
             $this->grav['twig']->twig_paths[] = $extra_path;
         }
 
-        $this->grav['twig']->twig_paths[] = __DIR__ . '/templates';
+        array_unshift($this->grav['twig']->twig_paths, __DIR__ . '/templates');
     }
 
     /**
@@ -141,8 +141,7 @@ class FlexDirectoryPlugin extends Plugin
             $this->grav['twig']->twig_paths[] = $extra_path;
         }
 
-        $this->grav['twig']->twig_paths[] = __DIR__ . '/admin/templates';
-
+        array_unshift($this->grav['twig']->twig_paths, __DIR__ . '/admin/templates');
     }
 
     /**
