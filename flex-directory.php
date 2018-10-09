@@ -83,6 +83,8 @@ class FlexDirectoryPlugin extends Plugin
     public function onPageInitialized()
     {
         if ($this->controller->isActive()) {
+            $this->grav['page']->path($this->controller->getPath());
+            $this->grav['page']->media();
             $this->controller->execute();
             $this->controller->redirect();
         }
