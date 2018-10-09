@@ -155,7 +155,9 @@ class FlexDirectoryPlugin extends Plugin
             $this->grav['twig']->twig_vars['action'] = $this->controller->getAction();
             $this->grav['twig']->twig_vars['task'] = $this->controller->getTask();
             $this->grav['twig']->twig_vars['target'] = $this->controller->getTarget();
-
+            if ($this->controller->isActive()) {
+                $this->grav['twig']->twig_vars['context'] = $this->grav['page'];
+            }
             // CSS / JS Assets
             $this->grav['assets']->addCss('plugin://flex-directory/css/admin.css');
             $this->grav['assets']->addCss('plugin://admin/themes/grav/css/codemirror/codemirror.css');
