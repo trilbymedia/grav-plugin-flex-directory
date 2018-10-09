@@ -220,4 +220,35 @@ abstract class SimpleController extends AdminBaseController
     {
         return $this->target;
     }
+
+    public function getPath()
+    {
+        $path = NULL;
+        if ($this->isActive()) {
+            $directory = $this->getDirectory($this->target);
+            $id = Grav::instance()['uri']->param('id');
+            $path = sprintf( dirname($directory->getStorageFilename(true)), $id );
+        }
+        return $path;
+    }
+
+    public function getUri()
+    {
+        $uri = NULL;
+        if ($this->isActive()) {
+            $directory = $this->getDirectory($this->target);
+            $id = Grav::instance()['uri']->param('id');
+            $uri = sprintf( dirname($directory->getStorageFilename()), $id );
+        }
+        return $uri;
+    }
+
+    public function getRoute()
+    {
+        $route = $this->getPath();
+        if ($route) {
+            $route = str_replace(Grav::instance()['locator']->findResource('page://', false, true), '', $route);
+        }
+        return $route;
+    }
 }

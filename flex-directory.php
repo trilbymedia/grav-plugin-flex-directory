@@ -159,6 +159,8 @@ class FlexDirectoryPlugin extends Plugin
             $this->grav['twig']->twig_vars['target'] = $this->controller->getTarget();
             if ($this->controller->isActive()) {
                 $this->grav['twig']->twig_vars['context'] = $this->grav['page'];
+                $this->grav['twig']->twig_vars['context_mediaUri'] = $this->controller->getUri();
+                $this->grav['twig']->twig_vars['context_route'] = $this->controller->getRoute();
             }
             // CSS / JS Assets
             $this->grav['assets']->addCss('plugin://flex-directory/css/admin.css');
