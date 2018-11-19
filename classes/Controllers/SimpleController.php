@@ -226,8 +226,10 @@ abstract class SimpleController extends AdminBaseController
         $path = NULL;
         if ($this->isActive()) {
             $directory = $this->getDirectory($this->target);
-            $id = Grav::instance()['uri']->param('id');
-            $path = sprintf( dirname($directory->getStorageFilename(true)), $id );
+            if (!empty($directory)) {
+                $id = Grav::instance()['uri']->param('id');
+                $path = sprintf( dirname($directory->getStorageFilename(true)), $id );
+            }
         }
         return $path;
     }
@@ -237,8 +239,10 @@ abstract class SimpleController extends AdminBaseController
         $uri = NULL;
         if ($this->isActive()) {
             $directory = $this->getDirectory($this->target);
-            $id = Grav::instance()['uri']->param('id');
-            $uri = sprintf( dirname($directory->getStorageFilename()), $id );
+            if (!empty($directory)) {
+                $id = Grav::instance()['uri']->param('id');
+                $uri = sprintf( dirname($directory->getStorageFilename()), $id );
+            }
         }
         return $uri;
     }
