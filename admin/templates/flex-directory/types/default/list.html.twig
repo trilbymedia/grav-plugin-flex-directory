@@ -134,7 +134,7 @@
                 sortList: [
                     {% for key,options in fields %}
                     {% if options.sort %}
-                        {% if loop.index > 1 %}, {% endif %}[{{ loop.index - 1 }}, 0]
+                        {% if loop.index > 1 %}, {% endif %}[{{ loop.index - 1 }}, {{options.order}}]
                     {% else %}
                     {% endif %}
                     {% endfor %}

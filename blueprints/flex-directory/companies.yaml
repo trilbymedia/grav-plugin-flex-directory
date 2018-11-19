@@ -12,6 +12,7 @@ config:
         company:
           link: edit
           sort: 1
+          order: 0
         email:
           align: right
         website:
