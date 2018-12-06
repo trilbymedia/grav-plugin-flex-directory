@@ -152,6 +152,11 @@ class FolderStorage
             'folders' => false,
             'levels'  => 2
         ];
+        if (empty($this->grav['session']->admin_lang)) {
+            $site_lang = $this->grav['language']->getLanguage();
+        } else {
+            $site_lang = $this->grav['session']->admin_lang;
+        }
         $all = Folder::all($this->path, $params);
         foreach ($all as $name) {
             $extension = pathinfo($name, PATHINFO_EXTENSION);
@@ -159,7 +164,7 @@ class FolderStorage
             if ($extension !== $this->format) {
                 continue;
             }
-            if ($lang && (empty($this->grav['session']->admin_lang) || $lang !== $this->grav['session']->admin_lang)) {
+            if ($lang && (empty($site_lang) || $lang !== $site_lang)) {
                 continue;
             }
             if ( !isset($this->entries[dirname($name)])) {
