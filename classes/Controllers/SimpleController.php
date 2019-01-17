@@ -51,6 +51,12 @@ abstract class SimpleController extends AdminBaseController
             $this->location = $location;
             $this->action = !empty($this->post['action']) ? $this->post['action'] : $uri->param('action');
             $this->id = !empty($this->post['id']) ? $this->post['id'] : $uri->param('id');
+            if (!$this->id && !empty($this->post['params'])) {
+              $params = $this->jsonDecode([$this->post['params']]);
+              if (is_object($params) && !empty($params->id)) {
+                $this->id = $params->id;
+              }
+            }
             $this->target = $target;
             $this->active = true;
             $this->admin = Grav::instance()['admin'];
@@ -121,8 +127,26 @@ abstract class SimpleController extends AdminBaseController
 
     protected function prepareData(array $data)
     {
-        $type = trim("{$this->location}/{$this->target}", '/');
-        $data = $this->data($type, $data);
+        $type = trim("{$this->target}", '/');
+
+        return $this->data($type, $data);
+    }
+
+    public function data($type = null, $value = '')
+    {
+        if (!$type) {
+            return false;
+        }
+        $name = !empty($this->post['name']) ? $this->post['name'] : null;
+        if (!$name) {
+            return false;
+        }
+        $data = $this->getDirectory($type);
+
+        $field = $data->getBlueprint()->schema()->get("{$name}");
+        $field['folder'] = $this->getPath();
+
+        $data->getBlueprint()->schema()->set("{$name}", $field);
 
         return $data;
     }
@@ -132,7 +156,7 @@ abstract class SimpleController extends AdminBaseController
         try {
             $obj->validate();
         } catch (\Exception $e) {
-            $this->admin->setMessage($e->getMessage(), 'error');
+            $this->setMessage($e->getMessage(), 'error');
             return false;
         }
 
@@ -221,6 +245,11 @@ abstract class SimpleController extends AdminBaseController
         return $this->target;
     }
 
+    public function getDirectory($type)
+    {
+        return $this->grav['flex_directory']->getDirectory($type);
+    }
+
     public function getPath()
     {
         $path = NULL;
@@ -251,7 +280,7 @@ abstract class SimpleController extends AdminBaseController
     {
         $route = $this->getPath();
         if ($route) {
-            $route = str_replace(Grav::instance()['locator']->findResource('page://', false, true), '', $route);
+            $route = str_replace($this->grav['locator']->findResource('page://', false, true), '', $route);
         }
         return $route;
     }
