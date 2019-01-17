@@ -16,6 +16,11 @@
 #directory .tablesorter-filter.disabled {
   display: none; }
 
+#directory .tablesorter-header-inner {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden; }
+
 #directory .edit-action {
   float: left;
   color: #41bea8 !important; }

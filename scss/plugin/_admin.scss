@@ -28,6 +28,12 @@
         display: none;
     }
 
+    .tablesorter-header-inner {
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+    }
+
     .edit-action {
         float: left;
         color: #41bea8 !important;
@@ -51,7 +57,7 @@
         td {
             padding-left: 1.5rem;
             padding-right: 1.5rem;
-        }        
+        }
     }
 
     tr {
