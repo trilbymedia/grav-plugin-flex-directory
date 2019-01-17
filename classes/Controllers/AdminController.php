@@ -2,6 +2,7 @@
 namespace Grav\Plugin\FlexDirectory\Controllers;
 
 use Grav\Common\Grav;
+use Grav\Common\Utils;
 use Grav\Plugin\FlexDirectory\FlexType;
 
 /**
@@ -39,6 +40,12 @@ class AdminController extends SimpleController
         $id = Grav::instance()['uri']->param('id') ?: null;
 
         $directory = $this->getDirectory($type);
+
+        foreach ($this->data as $key => $value) {
+            if (Utils::startsWith($key, '_')) {
+                unset ($this->data[$key]);
+            }
+        }
 
         // if no id param, assume new, generate an ID
         $object = $directory->update($this->data, $id);
@@ -80,7 +87,7 @@ class AdminController extends SimpleController
         $this->grav['session']->post_entries_save = $saved_option;
     }
 
-        /**
+    /**
      * Switch the content language. Optionally redirect to a different page.
      *
      */
@@ -124,12 +131,4 @@ class AdminController extends SimpleController
         return null !== $id ? $collection[$id] : $collection;
     }
 
-    /**
-     * @param string $type
-     * @return FlexType
-     */
-    protected function getDirectory($type)
-    {
-        return Grav::instance()['flex_directory']->getDirectory($type);
-    }
 }
