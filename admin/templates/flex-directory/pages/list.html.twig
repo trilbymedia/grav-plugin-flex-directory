@@ -10,4 +10,9 @@
     {% set path = directory.config('admin/list/template')|default('flex-directory/types/' ~ target ~ '/list.html.twig') %}
     {% include [path, 'flex-directory/types/default/list.html.twig'] %}
 </div>
+<style>
+    #admin-main {
+        max-width: 100% !important;
+    }
+</style>
 {% endblock %}
