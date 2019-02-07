@@ -86,7 +86,8 @@ class AdminController extends SimpleController
             $this->admin->setMessage($this->admin->translate('PLUGIN_ADMIN.SUCCESSFULLY_SAVED'), 'info');
 
             if (!$this->redirect && $new) {
-                $edit_page = $this->location . '/' . $this->target . '/id:' . $id;
+                $separator = Grav::instance()['config']->get('system.param_sep');
+                $edit_page = $this->location . '/' . $this->target . '/id' . $separator . $id;
                 $this->setRedirect($edit_page);
             }
 
@@ -100,10 +101,11 @@ class AdminController extends SimpleController
     protected function processPostEntriesSave($var)
     {
         $saved_option = 'edit';
+        $separator = Grav::instance()['config']->get('system.param_sep');
 
         switch ($var) {
             case 'create-new':
-                $this->setRedirect($this->location . '/' . $this->target . '/action:add');
+                $this->setRedirect($this->location . '/' . $this->target . '/action' . $separator . 'add');
                 $saved_option = $var;
                 break;
             case 'list':
