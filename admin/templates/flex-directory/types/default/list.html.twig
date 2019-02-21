@@ -5,8 +5,11 @@
 {% set fields_set = 0 %}
 {% set title_field = directory.config('admin/list/title') %}
 {% for key,options in fields %}
-    {% set fields_width = fields_width + options.width ?: 0 %}
-    {% set fields_set = fields_set + (options.width ? 1 : 0) %}
+    {% if 'px' in options.width %}
+    {% else %}
+        {% set fields_width = fields_width + options.width ?: 0 %}
+        {% set fields_set = fields_set + (options.width ? 1 : 0) %}
+    {% endif %}
     {% if not title_field and options.link == 'edit' %}
         {% set title_field = key %}
     {% endif %}
@@ -33,7 +36,11 @@
     <table id="data-table" class="tablesorter tablesorter-default" style="display: none;">
         <colgroup>
             {% for key,options in fields %}
-                <col width="{{ options.width ?: ((100-fields_width) / ((fields_count-fields_set) ?: 1))|round(3) }}" />
+                {% if 'px' in options.width %}
+                    <col width="{{ options.width }}" />
+                {% else %}
+                    <col width="{{ options.width ?: ((100-fields_width) / ((fields_count-fields_set) ?: 1))|round(3) }}" />
+                {% endif %}
             {% endfor %}
             <col width="8" />
         </colgroup>
@@ -134,8 +141,7 @@
                 sortList: [
                     {% for key,options in fields %}
                     {% if options.sort %}
-                        {% if loop.index > 1 %}, {% endif %}[{{ loop.index - 1 }}, {{options.order}}]
-                    {% else %}
+                        [{{ loop.index - 1 }}, {{options.order}}],                    {% else %}
                     {% endif %}
                     {% endfor %}
                 ],
@@ -149,6 +155,17 @@
             $('#pager button').on('click', function(e) { e.preventDefault(); });
         })(jQuery));
     </script>
+
+    <style>
+        #admin-main {
+            max-width: 100% !important;
+        }
+        .default-box-shadow {
+            box-shadow: none;
+            width: fit-content;
+            min-width: 100%;
+        }
+    </style>
 
 {% endif %}
 
