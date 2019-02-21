@@ -20,6 +20,10 @@ class FlexDirectory implements \Countable
         foreach ($types as $type => $config) {
             $this->types[$type] = new FlexType($type, $config, true);
         }
+        $order_by = 'priority';
+        usort($this->types, function ($a, $b) use ($order_by) {
+            return $a->getBlueprint()->get($order_by) < $b->getBlueprint()->get($order_by);
+        });
     }
 
     /**
