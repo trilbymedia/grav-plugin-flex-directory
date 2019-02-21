@@ -72,7 +72,11 @@ class FolderStorage
         $parts = explode('%s', $path);
         $this->path = rtrim($parts[0], '/');
         if (!empty($parts[1])) {
-            $this->filename = '%s/'.basename(ltrim($parts[1], '/'), '.'.$format);
+            if ($parts[1] === '%s.'.$format) {
+                $this->filename = '%s.'.$format;
+            } else {
+                $this->filename = '%s/'.basename(ltrim($parts[1], '/'), '.'.$format);
+            }
         }
 
         $lang = pathinfo($this->filename, PATHINFO_EXTENSION);
@@ -160,15 +164,17 @@ class FolderStorage
         $all = Folder::all($this->path, $params);
         foreach ($all as $name) {
             $extension = pathinfo($name, PATHINFO_EXTENSION);
-            $lang = pathinfo( rtrim(basename($name), '.'.$extension), PATHINFO_EXTENSION);
+            $lang = pathinfo( pathinfo(basename($name), PATHINFO_FILENAME), PATHINFO_EXTENSION);
             if ($extension !== $this->format) {
                 continue;
             }
             if ($lang && (empty($site_lang) || $lang !== $site_lang)) {
                 continue;
             }
-            if ( !isset($this->entries[dirname($name)])) {
-                $this->entries[dirname($name)] = $this->readfile($this->path.'/'.$name);
+            $parts = explode('/',$name);
+            $key = empty($parts[1]) ? pathinfo($name, PATHINFO_FILENAME) : dirname($name);
+            if ( !isset($this->entries[$key])) {
+                $this->entries[$key] = $this->readfile($this->path.'/'.$name);
             }
         }
         return $this->entries;
@@ -207,7 +213,6 @@ class FolderStorage
     public function delete($key)
     {
         $filename = sprintf('%s/'.$this->filename.'.%s', $this->path, $key, $this->format);
-        // print_r($filename);die();
         try {
             Folder::delete( dirname($filename) );
             @unlink($filename);
