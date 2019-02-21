@@ -2,6 +2,7 @@
 
 #types {
     padding: 3rem;
+    justify-content: space-evenly;
 
     .card-item {
         max-width: 100%;
@@ -14,6 +15,7 @@
 }
 
 #directory {
+    position: relative;
 
     .no-entries {
         padding: 3rem;
@@ -46,6 +48,9 @@
 
     table {
         display: table;
+        margin-bottom: 100px;
+        width: auto;
+        min-width: 100%;
     }
 
     thead {
@@ -68,15 +73,19 @@
     td, th {
         display: table-cell;
         flex: none;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 40rem;
         &:focus {
             outline: 0 !important;
         }
     }
 
+    th {
+        padding-right: 1rem;
+    }
+
     td {
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
     }
 
     td:last-child {
@@ -102,8 +111,17 @@
     }
 
     #pager {
-        margin: 50px 0;
-        text-align: center;
+        text-align: left;
+        padding: 20px;
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: -70px;
+        background-color: #fff;
+
+        #directory #pager > form {
+            display: inline-block;
+        }
 
         .pagedisplay {
             padding: 0 10px;

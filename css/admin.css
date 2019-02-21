@@ -1,10 +1,15 @@
 /* Admin Styles */
 #types {
-  padding: 3rem; }
+  padding: 3rem;
+  justify-content: space-evenly; }
   #types .card-item {
     max-width: 100%; }
     #types .card-item p {
       margin: 1rem 0 0; }
+
+#directory {
+    position: relative;
+}
 
 #directory .no-entries {
   padding: 3rem; }
@@ -30,7 +35,10 @@
   color: #da4b46 !important; }
 
 #directory table {
-  display: table; }
+  display: table;
+  margin-bottom: 100px;
+  width: auto;
+  min-width: 100%; }
 
 #directory thead {
   display: table-header-group; }
@@ -47,14 +55,19 @@
 
 #directory td, #directory th {
   display: table-cell;
-  flex: none; }
+  flex: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 40rem; }
   #directory td:focus, #directory th:focus {
     outline: 0 !important; }
 
+#directory th {
+  padding-right: 1rem;
+}
 #directory td {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis; }
+}
 
 #directory td:last-child {
   text-align: right;
@@ -74,8 +87,16 @@
   display: none; }
 
 #directory #pager {
-  margin: 50px 0;
-  text-align: center; }
+    text-align: left;
+    padding: 20px;
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -70px;
+    background-color: #fff; }
+  #directory #pager > form {
+      display: inline-block;
+  }
   #directory #pager .pagedisplay {
     padding: 0 10px; }
   #directory #pager .button {
