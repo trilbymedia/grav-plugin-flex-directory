@@ -13,12 +13,19 @@
             {% if entry.published %}
             <li>
                 <div class="entry-details">
-                    <h3><span class="name">{{ entry.first_name }} {{ entry.last_name }}</span><br><small>&lt;<span class="email">{{ entry.email }}</span>&gt;</small></h3>
+                    <h3><span class="company">{{ entry.company }}</span></h3>
+                    <div>email: <b><span class="email">{{ entry.email }}</span></b></div>
                     <div>Web Site: <b><span class="website">{{ entry.website }}</span></b></div>
+                    <hr>
+                    <div class="address">
+                        {{ entry.address.street }}
+                        <br>{{ entry.address.city }}, {{ entry.address.state }}
+                        <br>{{ entry.address.country }}
+                    </div>
                 </div>
                 <hr>
                  <div class="entry-extra">
-                    {% for tag in entry.tags %}
+                    {% for tag in (entry.tags|default('')|split(',')) %}
                         <span>{{ tag }}</span>
                     {% endfor %}
                 </div>
@@ -30,7 +37,7 @@
 
 <script>
     var options = {
-        valueNames: [ 'name', 'email', 'website' ]
+        valueNames: [ 'company', 'email', 'website', 'address' ]
     };
     var userList = new List('flex-directory', options);
 </script>

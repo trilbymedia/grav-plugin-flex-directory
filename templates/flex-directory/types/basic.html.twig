@@ -6,8 +6,8 @@
         {% for entry in collection %}
             <li>
                 <div class="entry-details">
-                    {% for key,field in entry %}
-                        <div>{{ key }}: {{ field|json_encode }}</div>
+                    {% for key,field in array(json_decode(json_encode(entry))) %}
+                        <div><small>{{ key }}:</small> {{ field|json_encode }}</div>
                     {% endfor %}
                 </div>
             </li>
