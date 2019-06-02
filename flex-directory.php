@@ -123,8 +123,6 @@ class FlexDirectoryPlugin extends Plugin
      */
     public function onTwigTemplatePaths()
     {
-        if (!$this->controller->isActive()) return;
-
         $extra_site_twig_path = $this->config->get('plugins.flex-directory.extra_site_twig_path');
         $extra_path = $extra_site_twig_path ? $this->grav['locator']->findResource($extra_site_twig_path) : null;
         if ($extra_path) {
@@ -182,6 +180,7 @@ class FlexDirectoryPlugin extends Plugin
             if ($this->config->get('plugins.flex-directory.built_in_css')) {
                 $this->grav['assets']->addCss('plugin://flex-directory/css/site.css');
             }
+            $this->grav['assets']->addJs('plugin://flex-directory/js/list.min.js');
         }
     }
 }
