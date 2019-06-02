@@ -20,7 +20,7 @@ config:
   data:
     storage:
       type: file
-      file: user://data/flex-directory/contacts.yaml
+      file: user://data/flex-directory/contacts.json
 
 form:
   validation: loose
