@@ -37,8 +37,9 @@ This plugin works out of the box, but provides several fields that make modifyin
 ```yaml
 enabled: true
 built_in_css: true
-json_file: 'user://data/flex-directory/entries.json'
-blueprint_file: 'plugin://flex-directory/blueprints/entries.yaml'
+directories:
+  companies: plugin://flex-directory/blueprints/flex-directory/companies.yaml
+  contacts: plugin://flex-directory/blueprints/flex-directory/contacts.yaml
 extra_admin_twig_path: 'theme://admin/templates'
 extra_site_twig_path:
 ```
@@ -60,7 +61,7 @@ Alternatively just create a page called `flex-directory.md` or set the template 
 flex-directory/templates
 ├── flex-directory.html.twig
 └── flex-directory
-    └── site.html.twig
+    └── ...
 ```
 
 # Modifications
@@ -78,98 +79,103 @@ These are probably not the exact fields you might want, so you will probably wan
 
 Let's assume you simply want to add a new "Phone Number" field to the existing Data and remove the "Tags".  These are the steps you would need to perform:
 
-1. Copy the `blueprints/entries.yaml` Blueprint file to another location, let's say `user/data/flex-directory/` but really it could be anywhere (another plugin, your theme, etc.)
+1. Copy the `blueprints/flex-directory/contacts.yaml` Blueprint file to another location, let's say `user/blueprints/flex-directory/` but really it could be anywhere (another plugin, your theme, etc.)
 
-1. Edit the `user/data/flex-directory/entries.yaml` like so:
+1. Edit the `user/blueprints/flex-directory/contacts.yaml` like so:
 
     ```yaml
-    title: Flex Directory
-    form:
-      validation: loose
-    
+    title: Contacts
+    description: Simple contact directory with tags.
+    type: flex-directory
+    config:
+    admin:
+      list:
+      title: name
       fields:
         published:
-          type: toggle
-          label: Published
-          highlight: 1
-          default: 1
-          options:
-            1: PLUGIN_ADMIN.YES
-            0: PLUGIN_ADMIN.NO
-          validate:
-            type: bool
-            required: true
+        width: 8
         last_name:
-          type: text
-          label: Last Name
-          validate:
-            required: true
+        link: edit
         first_name:
-          type: text
-          label: First Name
+        link: edit
+        company:
         email:
-          type: email
-          label: Email
-          validate:
-            required: true
         website:
-          type: text
-          label: Website
         tags:
-          type: selectize
-          size: large
-          label: Tags
-          classes: fancy
-          validate:
-            type: commalist
-    
-        tools_section:
-          type: section
-          field_classes: overlay bottom
-    
-    
-          fields:
-    
-            _post_entries_save:
-              label: PLUGIN_FLEX_DIRECTORY.AFTER_SAVE
-              type: save-redirect
-              default: create-new
-
+    data:
+      storage:
+      type: file
+      file: user://data/flex-directory/contacts.json
+    form:
+    validation: loose
+    fields:
+      published:
+        type: toggle
+        label: Published
+        highlight: 1
+        default: 1
+        options:
+          1: PLUGIN_ADMIN.YES
+          0: PLUGIN_ADMIN.NO
+        validate:
+          type: bool
+          required: true
+      last_name:
+        type: text
+        label: Last Name
+        validate:
+          required: true
+      first_name:
+        type: text
+        label: First Name
+        validate:
+          required: true
+      company:
+        type: text
+        label: Company Name
+      email:
+        type: email
+        label: Email Address
+        validate:
+          required: true
+      website:
+        type: url
+        label: Web Site
+      address.street1:
+        type: text
+        label: Address 1
+      address.street2:
+        type: text
+        label: Address 2
+      address.city:
+        type: text
+        label: City
+      address.country:
+        type: text
+        label: Country
+      address.state:
+        type: text
+        label: State or Province
+      address.zip:
+        type: text
+        label: Postal / Zip Code
+      tags:
+        type: selectize
+        size: large
+        label: Tags
+        classes: fancy
+        validate:
+          type: commalist
     ```
 
     Notice how we removed the `tags:` Blueprint field definition, and added a simple text field for `phone:`.  If you have questions about available form fields, [check out the extensive documentation](https://learn.getgrav.org/forms/blueprints/fields-available) on the subject.
 
-1. Now we have to instruct the plugin to use this new blueprint rather then the default one provided with the plugin.  This is simple enough, just edit the **Blueprint File** option in the plugin configuration file `flex-directory.yaml` to point to: `user://data/flex-directory/entries.yaml`, and make sure you save it. This will modify the `entries-edit` form automatically.  
+1. Now we have to instruct the plugin to use this new blueprint rather then the default one provided with the plugin.  This is simple enough, just edit the **Blueprint Directory** option in the plugin configuration file `flex-directory.yaml` to point to: `user://data/blueprints/flex-directory`, and make sure you save it.
 
-1. Now we need to adjust the `entries-list` form that shows the columns.  To do this, you are going to need to copy the existing `user/plugins/flex-directory/admin/templates/partials/entries-list.html.twig` file to another location that is in the **Twig Paths** <sup>1</sup>. The simplest way to add Twig templates is to simply add them under your theme's `templates/` folder ensuring the folder structure is maintained. Let's assume you are using Antimatter theme (although any theme will work), simply copy the `entries-list.html.twig` file to `user/themes/antimatter/admin/templates/partials/entries-list.html.twig` (you will have to create these folders as `admin/` doesn't exist under themes usually) and edit it.
 
-    The first part to edit is the column headers, let's replace the `Tags` header with `Phone`
+1. We need to copy the frontend Twig file and modify it to add the new "Phone" field.  By default your theme already has its `templates`. We'll simply copy the `user/plugins/flex-directory/templates/flex-directory/types/contacts.html.twig` file to `user/themes/quark/templates/flex-directory/types/contacts.html.twig`. Notice, there is no reference to `admin/` here, this is site template, not an admin one.
 
-    ```twig
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Website</th>
-                <th>Phone</th>
-                <th>&nbsp;</th>
-            </tr>
-        </thead>
-    ```
-
-    Next you simply need to edit the actual column, replacing the `entry.tags` output with:
-
-    ```twig
-        <td>
-            {{ entry.phone }}
-        </td>
-    ```
-    
-    This will ensure the backend now lets you edit and list the new "Phone" field, but now we have to fix the frontend to render it.
-
-1. We need to copy the frontend Twig file and modify it to add the new "Phone" field.  By default your theme already has its `templates`, so we can take advantage of it <sup>2</sup>. We'll simply copy the `user/plugins/flex-directory/templates/flex-directory/site.html.twig` file to `user/themes/antimatter/templates/flex-directory/site.html.twig`. Notice, there is no reference to `admin/` here, this is site template, not an admin one.
-
-1. Edit the `site.html.twig` file you just copied so it has these modifications:
+1. Edit the `contacts.html.twig` file you just copied so it has these modifications:
 
     ```twig
         <li>
@@ -182,26 +188,9 @@ Let's assume you simply want to add a new "Phone Number" field to the existing D
                 {% if entry.email %}
                     <p><a href="mailto:{{ entry.email }}" class="email">{{ entry.email }}</a></p>
                 {% endif %}
-                {% if entry.phone %}
-                    <p class="phone">{{ entry.phone }}</p>
-                {% endif %}
             </div>
         </li>
     ```
-
-    And also the JavaScript initialization which provides which hooks up certain classes to the search:
-    
-    ```html
-    <script>
-        var options = {
-            valueNames: [ 'name', 'email', 'website', 'phone' ]
-        };
-    
-        var userList = new List('flex-directory', options);
-    </script>
-    ```
-
-    Notice, we removed the `entry-extra` DIV, and added a new `if` block with the Twig code to display the phone number if set.
 
 # File Upload
 
@@ -218,7 +207,7 @@ With Flex Directory v2.0, you can now utilize the `file` form field.  []The stan
 
 # Advanced
 
-You can radically alter the structure of the `entries.json` data file by making major edits to the `entries.yaml` blueprint file.  However, it's best to start with an empty `entries.json` if you are making wholesale changes or you will have data conflicts.  Best to create your blueprint first.  Reloading a **New Entry** until the form looks correct, then try saving, and check to make sure the stored `user/data/flex-directory/entries.json` file looks correct.
+You can radically alter the structure of the `countries.json` data file by making major edits to the `countries.yaml` blueprint file.  However, it's best to start with an empty `countries.json` if you are making wholesale changes or you will have data conflicts.  Best to create your blueprint first.  Reloading a **New Entry** until the form looks correct, then try saving, and check to make sure the stored `user/data/flex-directory/countries.json` file looks correct.
 
 Then you will need to make more widespread changes to the admin and site Twig templates.  You might need to adjust the number of columns and the field names.  You will also need to pay attention to the JavaScript initialization in each template.
 
