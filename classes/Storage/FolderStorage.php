@@ -2,6 +2,7 @@
 namespace Grav\Plugin\FlexDirectory\Storage;
 
 use Grav\Common\Grav;
+use Grav\Common\Page\Media;
 use Grav\Common\File\CompiledJsonFile;
 use Grav\Common\File\CompiledMarkdownFile;
 use Grav\Common\File\CompiledYamlFile;
@@ -143,6 +144,7 @@ class FolderStorage
             $data['header']['markdown'] = $data['markdown'];
             $data = $data['header'];
         }
+        $data['media'] = new Media(dirname($filename));
         return $data;
     }
 
