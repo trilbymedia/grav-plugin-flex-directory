@@ -2,6 +2,7 @@
 namespace Grav\Plugin\FlexDirectory\Storage;
 
 use Grav\Common\Grav;
+use Grav\Common\Data\BlueprintSchema;
 use Grav\Common\Page\Media;
 use Grav\Common\File\CompiledJsonFile;
 use Grav\Common\File\CompiledMarkdownFile;
@@ -36,6 +37,11 @@ class FolderStorage
     protected $format = 'json';
 
     /**
+     * @var array
+     */
+    protected $blueprint = NULL;
+
+    /**
      * @var array|FolderStorage[]
      */
     static protected $instances = [];
@@ -46,7 +52,7 @@ class FolderStorage
      * @param  string  $filename
      * @return static
      */
-    public static function instance($path = '', $format = 'json')
+    public static function instance($path = '', $format = 'json', $blueprint = NULL)
     {
         if (!is_string($path) && $path) {
             throw new \InvalidArgumentException('Path should be non-empty string');
@@ -56,7 +62,7 @@ class FolderStorage
         }
         if (!isset(static::$instances[$path])) {
             static::$instances[$path] = new static;
-            static::$instances[$path]->init($path, $format);
+            static::$instances[$path]->init($path, $format, $blueprint);
         }
         return static::$instances[$path];
     }
@@ -67,7 +73,7 @@ class FolderStorage
      * @param $path
      * @param $type
      */
-    protected function init($path = '', $format = 'json')
+    protected function init($path = '', $format = 'json', $blueprint = NULL)
     {
         $this->grav = Grav::instance();
         $parts = explode('%s', $path);
@@ -86,6 +92,8 @@ class FolderStorage
         }
 
         $this->format = $format;
+
+        $this->blueprint = $blueprint ? $blueprint : new BlueprintSchema();
     }
 
     /**
@@ -134,6 +142,18 @@ class FolderStorage
     }
 
     /**
+     * Get a file.
+     *
+     * @param Page $page
+     * @return CompiledYamlFile
+     */
+    protected function getFileFrontmatter($filename)
+    {
+        $file = CompiledYamlFile::instance(dirname($filename) . '/frontmatter.yaml');
+        return $file;
+    }
+
+    /**
      * Read a file.
      */
     protected function readfile($filename)
@@ -145,6 +165,14 @@ class FolderStorage
             $data = $data['header'];
         }
         $data['media'] = new Media(dirname($filename));
+        // If there's a `frontmatter.yaml` file merge that in with the page header
+        // note page's own frontmatter has precedence and will overwrite any values from page file
+        $frontmatterFile = $this->getFileFrontmatter($filename);
+        if ($frontmatterFile->exists()) {
+            $frontmatter_data = (array)$frontmatterFile->content();
+            $data = array_replace_recursive($frontmatter_data, $data);
+            $frontmatterFile->free();
+        }
         return $data;
     }
 
@@ -190,9 +218,34 @@ class FolderStorage
      */
     public function save($data = null)
     {
+        $blocks =  array_unique(array_merge(
+            array_map(
+                function($field){ if (!empty($field['multilingual']) && $field['multilingual']) return $field['name']; },
+                array_values(array_filter($this->blueprint->schema()->getState()['items'], function($field) { return !empty($field['multilingual']); }))
+            ),
+            explode(',', $this->grav['config']->get('plugins.admin-frontmatter-yaml.blocks', '')),
+            ['markdown']
+        ));
         try {
             foreach ($data as $key=>$entry) {
-                $file = $this->getFile( sprintf('%s/'.$this->filename.'.%s', $this->path, $key, $this->format) );
+                $filename = sprintf('%s/'.$this->filename.'.%s', $this->path, $key, $this->format);
+                //
+                $frontmatter = [];
+                $header = [];
+                $header_all = $entry;
+                foreach ($header_all as $block_name=>$block_data) {
+                    if (in_array($block_name, $blocks)) {
+                        $header[$block_name] = $header_all[$block_name];
+                    } else {
+                        $frontmatter[$block_name] = $header_all[$block_name];
+                    }
+                }
+                $frontmatterFile = $this->getFileFrontmatter($filename);
+                $frontmatterFile->save($frontmatter);
+                $frontmatterFile->free();
+                $entry = $header;
+                //
+                $file = $this->getFile($filename);
                 if (get_class($file) === 'Grav\Common\File\CompiledMarkdownFile') {
                     $markdown = $entry['markdown'];
                     unset($entry['markdown']);

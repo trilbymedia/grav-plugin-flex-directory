@@ -300,10 +300,11 @@ class FlexType
         $filename = $this->getStorageFilename(true);
         $extension = pathinfo($filename, PATHINFO_EXTENSION);
         $type = $this->getStorageType();
+        $blueprint = $this->getBlueprint();
 
         switch ($type) {
             case 'folder':
-                $file = FolderStorage::instance($filename, $extension);
+                $file = FolderStorage::instance($filename, $extension, $blueprint);
                 break;
             case 'file':
                 switch ($extension) {
