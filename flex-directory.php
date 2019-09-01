@@ -123,6 +123,8 @@ class FlexDirectoryPlugin extends Plugin
      */
     public function onTwigTemplatePaths()
     {
+        if (!$this->controller->isActive()) return;
+
         $extra_site_twig_path = $this->config->get('plugins.flex-directory.extra_site_twig_path');
         $extra_path = $extra_site_twig_path ? $this->grav['locator']->findResource($extra_site_twig_path) : null;
         if ($extra_path) {
