@@ -218,16 +218,21 @@ class FolderStorage
      */
     public function save($data = null)
     {
+        $frontmatter_blocks = $this->grav['config']->get('plugins.admin-frontmatter-yaml.blocks', '');
+        if (!is_array($frontmatter_blocks)) {
+            $frontmatter_blocks = explode(',', $frontmatter_blocks);
+        }
         $blocks =  array_unique(array_merge(
             array_map(
                 function($field){ if (!empty($field['multilingual']) && $field['multilingual']) return $field['name']; },
                 array_values(array_filter($this->blueprint->schema()->getState()['items'], function($field) { return !empty($field['multilingual']); }))
             ),
-            explode(',', $this->grav['config']->get('plugins.admin-frontmatter-yaml.blocks', '')),
+            $frontmatter_blocks,
             ['markdown']
         ));
         try {
             foreach ($data as $key=>$entry) {
+                unset($entry['media']);
                 $filename = sprintf('%s/'.$this->filename.'.%s', $this->path, $key, $this->format);
                 //
                 $frontmatter = [];
