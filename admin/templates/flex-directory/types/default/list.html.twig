@@ -47,7 +47,7 @@
         <thead>
         <tr>
             {% for key,options in fields %}
-            <th>{{ schema.get(key).label }}</th>
+            <th>{{ schema.get(key).label|tu }}</th>
             {% endfor %}
             <th>{{ "PLUGIN_FLEX_DIRECTORY.ACTIONS"|tu }}</th>
         </tr>
@@ -70,6 +70,10 @@
                             <a href="{{ entry[key] }}" target="_blank"><i class="fa fa-link"></i> {{ entry[key] }}</a>
                         {% elseif field.type == 'selectize' %}
                             {{ entry[key]|join(',') }}
+                        {% elseif field.type == 'pagemedia' %}
+													{% for image in entry.media.images %}
+														<img alt="" width="64" height="64" src="{{ image.cropResize(64, 64).url }}" align="left">
+													{% endfor %}
                         {% else %}
                             {{ entry[key] }}
                         {% endif %}
@@ -141,7 +145,8 @@
                 sortList: [
                     {% for key,options in fields %}
                     {% if options.sort %}
-                        [{{ loop.index - 1 }}, {{options.order}}],                    {% else %}
+                        {% if loop.index > 1 %}, {% endif %}[{{ loop.index - 1 }}, {{options.order|default(0)}}]
+                    {% else %}
                     {% endif %}
                     {% endfor %}
                 ],
