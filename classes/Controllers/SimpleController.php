@@ -86,7 +86,7 @@ abstract class SimpleController extends AdminBaseController
                 return false;
             }
             $method = $this->task_prefix . ucfirst(strtolower($this->task));
-            if ($this->post) {
+            if ($this->data) {
                 $this->handlePostProcesses();
             }
         } elseif ($this->target) {
