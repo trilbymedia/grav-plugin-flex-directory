@@ -230,6 +230,7 @@ class FolderStorage
             $frontmatter_blocks,
             ['markdown']
         ));
+        $languages = $this->grav['language']->getLanguages();
         try {
             foreach ($data as $key=>$entry) {
                 unset($entry['media']);
@@ -258,6 +259,13 @@ class FolderStorage
                 }
                 $file->save($entry);
                 $file->free();
+                [ 'dirname' => $dirname, 'filename' => $name_width_lang] = pathinfo($filename);
+                [ 'filename' => $shortname, 'extension' => $ext ] = pathinfo($name_width_lang);
+                foreach ($languages as $lang) {
+                	$othername = $dirname.'/'.$shortname.'.'.$lang.'.'.$this->format;
+                	if ($lang === $ext || file_exists($othername)) continue;
+                	touch($othername);
+				}
             }
         } catch (\Exception $e) {
             throw new \RuntimeException(sprintf('Failed to save %s: %s', $this->path, $e->getMessage()), 500, $e);
