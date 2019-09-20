@@ -3,4 +3,5 @@ built_in_css: true
 extra_admin_twig_path: 'theme://admin/templates'
 extra_site_twig_path:
 directories:
+  companies: plugin://flex-directory/blueprints/flex-directory/companies.yaml
   contacts: plugin://flex-directory/blueprints/flex-directory/contacts.yaml

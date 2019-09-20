@@ -1,5 +1,5 @@
 name: Flex-Directory
-version: 4.0.0
+version: 4.0.1
 description: Simple Flexible Directory Plugin
 icon: list
 author:
@@ -10,6 +10,9 @@ keywords: grav, plugin, crud, directory
 bugs: https://github.com/trilbymedia/grav-plugin-flex-directory/issues
 docs: https://github.com/trilbymedia/grav-plugin-flex-directory/blob/develop/README.md
 license: MIT
+
+dependencies:
+- { name: grav, version: '>=1.5.1' }
 
 form:
   validation: strict

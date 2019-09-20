@@ -1,6 +1,7 @@
 <?php
 namespace Grav\Plugin\FlexDirectory;
 
+use Grav\Common\Grav;
 use Grav\Common\Filesystem\Folder;
 
 /**
@@ -19,8 +20,15 @@ class FlexDirectory implements \Countable
         foreach ($types as $type => $config) {
             $this->types[$type] = new FlexType($type, $config, true);
         }
+        $order_by = 'priority';
+        uasort($this->types, function ($a, $b) use ($order_by) {
+            return $a->getBlueprint()->get($order_by) < $b->getBlueprint()->get($order_by);
+        });
     }
 
+    /**
+     * @return array|FlexType[]
+     */
     public function getAll()
     {
         $params = [
@@ -44,6 +52,9 @@ class FlexDirectory implements \Countable
         return $directories;
     }
 
+    /**
+     * @return array|FlexType[]
+     */
     public function getDirectories()
     {
         return $this->types;
@@ -69,4 +80,31 @@ class FlexDirectory implements \Countable
     {
         return count($this->types);
     }
+
+    /**
+     * @param string
+     * @return array
+     */
+    static function getAllFromFolder($path)
+    {
+        $locator = Grav::instance()['locator'];
+
+        $params = [
+            'pattern'   => '|\.yaml|',
+            'folders'   => false,
+            'recursive' => false
+        ];
+
+        $all = Folder::all($locator->findResource($path, false, true), $params);
+
+        $directories = [];
+        foreach ($all as $file) {
+            $directories[rtrim($file, '.yaml')] = $path . '/' . $file;
+        }
+
+        ksort($directories);
+
+        return $directories;
+    }
+
 }

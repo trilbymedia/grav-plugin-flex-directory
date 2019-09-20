@@ -66,6 +66,9 @@ class FlexDirectoryPlugin extends Plugin
 
         $config = $this->config->get('plugins.flex-directory');
         $blueprints = $config['directories'] ?: [];
+        if (is_string($blueprints)) {
+            $blueprints = FlexDirectory::getAllFromFolder($blueprints);
+        }
 
         // Add to DI container
         $this->grav['flex_directory'] = function () use ($blueprints) {
@@ -80,6 +83,8 @@ class FlexDirectoryPlugin extends Plugin
     public function onPageInitialized()
     {
         if ($this->controller->isActive()) {
+            $this->grav['page']->path($this->controller->getPath());
+            $this->grav['page']->media();
             $this->controller->execute();
             $this->controller->redirect();
         }
@@ -96,7 +101,13 @@ class FlexDirectoryPlugin extends Plugin
      */
     public function onAdminMenu()
     {
-        $this->grav['twig']->plugins_hooked_nav['PLUGIN_FLEX_DIRECTORY.TITLE'] = ['route' => $this->name, 'icon' => 'fa-list'];
+        $this->grav['twig']->plugins_hooked_nav['PLUGIN_FLEX_DIRECTORY.TITLE'] = [
+            'route' => $this->name,
+            'icon' => 'fa-list',
+            'badge' => [
+                'count' => $this->grav['flex_directory']->count()
+            ]
+        ];
     }
 
     /**
@@ -112,13 +123,15 @@ class FlexDirectoryPlugin extends Plugin
      */
     public function onTwigTemplatePaths()
     {
+        if (!$this->controller->isActive()) return;
+
         $extra_site_twig_path = $this->config->get('plugins.flex-directory.extra_site_twig_path');
         $extra_path = $extra_site_twig_path ? $this->grav['locator']->findResource($extra_site_twig_path) : null;
         if ($extra_path) {
             $this->grav['twig']->twig_paths[] = $extra_path;
         }
 
-        $this->grav['twig']->twig_paths[] = __DIR__ . '/templates';
+        array_unshift($this->grav['twig']->twig_paths, __DIR__ . '/templates');
     }
 
     /**
@@ -126,14 +139,15 @@ class FlexDirectoryPlugin extends Plugin
      */
     public function onTwigAdminTemplatePaths()
     {
+        if (!$this->controller->isActive()) return;
+
         $extra_admin_twig_path = $this->config->get('plugins.flex-directory.extra_admin_twig_path');
         $extra_path = $extra_admin_twig_path ? $this->grav['locator']->findResource($extra_admin_twig_path) : null;
         if ($extra_path) {
             $this->grav['twig']->twig_paths[] = $extra_path;
         }
 
-        $this->grav['twig']->twig_paths[] = __DIR__ . '/admin/templates';
-
+        array_unshift($this->grav['twig']->twig_paths, __DIR__ . '/admin/templates');
     }
 
     /**
@@ -147,9 +161,14 @@ class FlexDirectoryPlugin extends Plugin
             $this->grav['twig']->twig_vars['action'] = $this->controller->getAction();
             $this->grav['twig']->twig_vars['task'] = $this->controller->getTask();
             $this->grav['twig']->twig_vars['target'] = $this->controller->getTarget();
-
+            if ($this->controller->isActive()) {
+                $this->grav['twig']->twig_vars['context'] = $this->grav['page'];
+                $this->grav['twig']->twig_vars['context_mediaUri'] = $this->controller->getUri();
+                $this->grav['twig']->twig_vars['context_route'] = $this->controller->getRoute();
+            }
             // CSS / JS Assets
             $this->grav['assets']->addCss('plugin://flex-directory/css/admin.css');
+            $this->grav['assets']->addCss('plugin://admin/themes/grav/css/codemirror/codemirror.css');
 
             if ($this->controller->getLocation() === 'flex-directory' && $this->controller->getAction() === 'list') {
                 $this->grav['assets']->addCss('plugin://flex-directory/css/filter.formatter.css');

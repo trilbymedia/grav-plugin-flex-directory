@@ -1,8 +1,16 @@
 en:
   PLUGIN_FLEX_DIRECTORY:
     TITLE: FlexDirectory
-    TYPES_TITLE: Directory Types
     AFTER_SAVE: After Save...
     CREATE_NEW: Create New Item
     EDIT: Edit Item
     LIST: List Items
+    ACTIONS: Actions
+ru:
+  PLUGIN_FLEX_DIRECTORY:
+    TITLE: Каталог
+    AFTER_SAVE: Действие после Сохранить...
+    CREATE_NEW: Добавить новое
+    EDIT: Редактировать
+    LIST: Перейти к списку
+    ACTIONS: Действия

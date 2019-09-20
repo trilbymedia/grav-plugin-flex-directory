@@ -1,5 +1,5 @@
-title: Contacts
-description: Simple contact directory with tags.
+title: Companies
+description: Simple companies directory with tags.
 type: flex-directory
 
 config:
@@ -9,18 +9,19 @@ config:
       fields:
         published:
           width: 8
-        last_name:
-          link: edit
-        first_name:
-          link: edit
         company:
+          link: edit
+          sort: 1
+          order: 0
         email:
+          align: right
         website:
         tags:
   data:
     storage:
-      type: file
-      file: user://data/flex-directory/contacts.json
+      type: folder
+      file: user://data/flex-directory/companies/%s/index.yaml
+      key: slug
 
 form:
   validation: loose
@@ -37,18 +38,9 @@ form:
       validate:
         type: bool
         required: true
-
-    last_name:
-      type: text
-      label: Last Name
-      validate:
-        required: true
-    first_name:
-      type: text
-      label: First Name
-      validate:
-        required: true
-
+    slug:
+      type: slug
+      label: Slug
     company:
       type: text
       label: Company Name
@@ -60,26 +52,15 @@ form:
     website:
       type: url
       label: Web Site
-
-    address.street1:
+    address.street:
       type: text
-      label: Address 1
-    address.street2:
-      type: text
-      label: Address 2
+      label: Address
     address.city:
       type: text
       label: City
     address.country:
       type: text
       label: Country
-    address.state:
-      type: text
-      label: State or Province
-    address.zip:
-      type: text
-      label: Postal / Zip Code
-
     tags:
       type: selectize
       size: large

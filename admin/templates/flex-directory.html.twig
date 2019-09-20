@@ -1,5 +1,13 @@
 {% set template = (action == 'add') ? 'edit' : (action == 'delete') ? 'list' : action ?: 'types' %}
 {% extends 'flex-directory/pages/' ~ template ~ '.html.twig' %}
 
+{% if target %}
+    {% set flex = grav.flex_directory %}
+    {% set directory = flex.directory(target) %}
+    {% set title = directory.title ~ ' / ' ~ "PLUGIN_FLEX_DIRECTORY.TITLE"|tu %}
+{% else %}
+    {% set title = "PLUGIN_FLEX_DIRECTORY.TITLE"|tu %}
+{% endif %}
+
 {% set base_route = location %}
 {% set separator = config.system.param_sep %}

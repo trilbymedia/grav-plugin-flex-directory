@@ -5,8 +5,11 @@
 {% set fields_set = 0 %}
 {% set title_field = directory.config('admin/list/title') %}
 {% for key,options in fields %}
-    {% set fields_width = fields_width + options.width ?: 0 %}
-    {% set fields_set = fields_set + (options.width ? 1 : 0) %}
+    {% if 'px' in options.width %}
+    {% else %}
+        {% set fields_width = fields_width + options.width ?: 0 %}
+        {% set fields_set = fields_set + (options.width ? 1 : 0) %}
+    {% endif %}
     {% if not title_field and options.link == 'edit' %}
         {% set title_field = key %}
     {% endif %}
@@ -27,22 +30,26 @@
 </div>
 {% elseif not collection.count %}
     <div class="no-entries">
-        There are currently no entries, click the <a href="{{ base_url ~ '/flex-directory/' ~ target ~ '/action:add' }}">Add</a> button to create a new one...
+        There are currently no entries, click the <a href="{{ base_url ~ '/flex-directory/' ~ target ~ '/action:add' }}">{{ "PLUGIN_ADMIN.ADD"|tu }}</a> button to create a new one...
     </div>
 {% else %}
-    <table id="data-table" class="tablesorter tablesorter-default">
+    <table id="data-table" class="tablesorter tablesorter-default" style="display: none;">
         <colgroup>
             {% for key,options in fields %}
-                <col width="{{ options.width ?: ((100-fields_width) / ((fields_count-fields_set) ?: 1))|round(3) }}" />
+                {% if 'px' in options.width %}
+                    <col width="{{ options.width }}" />
+                {% else %}
+                    <col width="{{ options.width ?: ((100-fields_width) / ((fields_count-fields_set) ?: 1))|round(3) }}" />
+                {% endif %}
             {% endfor %}
             <col width="8" />
         </colgroup>
         <thead>
         <tr>
             {% for key,options in fields %}
-            <th>{{ schema.get(key).label }}</th>
+            <th>{{ schema.get(key).label|tu }}</th>
             {% endfor %}
-            <th>Actions</th>
+            <th>{{ "PLUGIN_FLEX_DIRECTORY.ACTIONS"|tu }}</th>
         </tr>
         </thead>
         <tbody>
@@ -50,7 +57,7 @@
             <tr>
                 {% for key,options in fields %}
                     {% set field = schema.get(key) %}
-                    <td>
+                    <td align="{{ options.align ?: options.align }}">
                         {% if options.link == 'edit' %}
                             <a href="{{ entry_url ~ id }}">{{ entry[key] }}</a>
                         {% elseif field.type == 'toggle' %}
@@ -63,6 +70,10 @@
                             <a href="{{ entry[key] }}" target="_blank"><i class="fa fa-link"></i> {{ entry[key] }}</a>
                         {% elseif field.type == 'selectize' %}
                             {{ entry[key]|join(',') }}
+                        {% elseif field.type == 'pagemedia' %}
+													{% for image in entry.media.images %}
+														<img alt="" width="64" height="64" src="{{ image.cropResize(64, 64).url }}" align="left">
+													{% endfor %}
                         {% else %}
                             {{ entry[key] }}
                         {% endif %}
@@ -71,11 +82,11 @@
                 <td>
                     {% set entry_title = title_field ? "'" ~ entry[title_field]|join(' ') ~ "'" : 'Item' %}
                     <a href="{{ entry_url ~ id }}"
-                       title="Edit {{ entry_title }}"
+                       title="{{ "PLUGIN_ADMIN.EDIT"|tu }}: {{ entry_title }}"
                        class="edit-action"><i class="fa fa-pencil"></i></a>
                     <a href="#delete"
                        class="page-delete delete-action"
-                       title="Delete {{ entry_title }}"
+                       title="{{ "PLUGIN_ADMIN.DELETE"|tu }}: {{ entry_title }}"
                        data-remodal-target="delete"
                        data-delete-url="{{ uri.addNonce(entry_url ~ id  ~ '/action' ~ separator ~ 'delete', 'admin-form', 'admin-nonce') }}"><i class="fa fa-close"></i></a>
                 </td>
@@ -125,11 +136,22 @@
                 widgetOptions: {
                     pager_output: '{startRow} - {endRow} / {filteredRows} ({totalRows})',
                         pager_removeRows: false,
-                        pager_size: 10,
+                        pager_size: 20,
                         filter_childRows: false,
                         filter_cssFilter: 'tablesorter-filter',
                         filter_startsWith: false,
                         filter_ignoreCase: true
+                },
+                sortList: [
+                    {% for key,options in fields %}
+                    {% if options.sort %}
+                        {% if loop.index > 1 %}, {% endif %}[{{ loop.index - 1 }}, {{options.order|default(0)}}]
+                    {% else %}
+                    {% endif %}
+                    {% endfor %}
+                ],
+                initialized: function(table) {
+                    list.show();
                 }
             });
 
@@ -138,6 +160,17 @@
             $('#pager button').on('click', function(e) { e.preventDefault(); });
         })(jQuery));
     </script>
+
+    <style>
+        #admin-main {
+            max-width: 100% !important;
+        }
+        .default-box-shadow {
+            box-shadow: none;
+            width: fit-content;
+            min-width: 100%;
+        }
+    </style>
 
 {% endif %}
 
