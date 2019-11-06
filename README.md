@@ -1,3 +1,5 @@
+## NOTE: THIS PROJECT HAS BEEN SUPERCEDED BY THE [FLEX-OBJECTS PLUGIN](https://github.com/trilbymedia/grav-plugin-flex-objects) WHICH PROVIDES ALL EXISTING FUNCTIONALITY AND MUCH, MUCH MORE...
+
 # Flex Directory Plugin
 
 ## About
